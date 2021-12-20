@@ -1,0 +1,11 @@
+*.asc
+*.bin
+*.json
+*.vcd
+delay.v
+event_counter_sync.v
+glitchcore.v
+glitchcore_uart.v
+glitchcore_wb.v
+pulse.v
+glitchcore_wb_tb.vvp
