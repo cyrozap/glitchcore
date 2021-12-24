@@ -39,7 +39,7 @@ class EventCounterSync(Elaboratable):
                 with m.If((self.arm_in).bool()):
                     m.next = "ARMED"
                     m.d.comb += self.rst_out.eq(0),
-                    m.d.comb += self.enable_out.eq(1),
+                    m.d.comb += self.enable_out.eq(0),
             with m.State("ARMED"):
                 m.d.comb += self.rst_out.eq(0),
                 m.d.comb += self.enable_out.eq(1),
