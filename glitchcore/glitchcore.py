@@ -102,12 +102,13 @@ class GlitchCore(Elaboratable):
         with m.Else():
             m.d.comb += trigger_delay.trigger_in.eq(event_internal)
 
-        with m.If(self.delay_sel_in == 0):
-            m.d.comb += trigger_pulse.trigger_in.eq(trigger_delay.trigger_delayed)
-        with m.Elif(self.delay_sel_in == 1):
-            m.d.comb += trigger_pulse.trigger_in.eq(event_counter_async_trigger)
-        with m.Elif(self.delay_sel_in == 2):
-            m.d.comb += trigger_pulse.trigger_in.eq(event_internal)
+        with m.Switch(self.delay_sel_in):
+            with m.Case(0):
+                m.d.comb += trigger_pulse.trigger_in.eq(trigger_delay.trigger_delayed)
+            with m.Case(1):
+                m.d.comb += trigger_pulse.trigger_in.eq(event_counter_async_trigger)
+            with m.Default():
+                m.d.comb += trigger_pulse.trigger_in.eq(event_internal)
 
         with m.If(self.pulse_sel_in == 0):
             m.d.comb += self.glitch_out.eq(trigger_pulse.pulse)
