@@ -76,6 +76,9 @@ if __name__ == "__main__":
         yield dut.arm_in.eq(1)
         assert (yield dut.rst_out)
         assert not (yield dut.enable_out)
+        yield
+        assert not (yield dut.rst_out)
+        assert not (yield dut.enable_out)
         for _ in range(30):
             yield
             assert not (yield dut.rst_out)
