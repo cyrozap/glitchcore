@@ -23,7 +23,7 @@ class Glitcher:
         'WRITE': ord(b'W'),
     }
 
-    def __init__(self, port, baudrate=115200, timeout=1, write_timeout=1, debug=False, verbose=False):
+    def __init__(self, port, baudrate=115200, timeout=0.1, write_timeout=1, debug=False, verbose=False):
         self.debug = debug
         self.verbose = verbose or debug
         self.ser = serial.Serial(port, baudrate, timeout=timeout, write_timeout=write_timeout)
