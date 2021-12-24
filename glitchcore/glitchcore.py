@@ -18,7 +18,6 @@ class GlitchCore(Elaboratable):
 
         # In, from host.
         self.event_counter_arm_in = Signal()
-        self.event_counter_polarity_in = Signal()
         self.event_counter_threshold_in = Signal(width)
 
         # Out, to host.
@@ -42,12 +41,15 @@ class GlitchCore(Elaboratable):
         self.pulse_pulse = Signal()
 
         # In, from host.
+        self.event_polarity_in = Signal()
         self.trigger_sel_in = Signal()
         self.delay_sel_in = Signal(2)
         self.pulse_sel_in = Signal()
 
     def elaborate(self, platform):
         m = Module()
+
+        event_internal = Signal()
 
         event_counter_sync = EventCounterSync(self.width)
         trigger_delay = TriggerDelay(self.width)
@@ -57,9 +59,8 @@ class GlitchCore(Elaboratable):
         event_counter_async = Instance("event_counter_async",
             p_WIDTH = self.width,
             i_rst_i = event_counter_sync.rst_out,
-            i_event_i = self.event_in,
+            i_event_i = event_internal,
             i_enable_i = event_counter_sync.enable_out,
-            i_polarity_i = event_counter_sync.polarity_out,
             i_threshold_i = event_counter_sync.threshold_out,
             o_count_o = event_counter_sync.count_in,
             o_trigger_o = event_counter_async_trigger,
@@ -74,7 +75,6 @@ class GlitchCore(Elaboratable):
 
         m.d.comb += [
             event_counter_sync.arm_in.eq(self.event_counter_arm_in),
-            event_counter_sync.polarity_in.eq(self.event_counter_polarity_in),
             event_counter_sync.threshold_in.eq(self.event_counter_threshold_in),
             self.event_count_out.eq(event_counter_sync.count_out),
             self.event_trigger_out.eq(event_counter_sync.trigger_out),
@@ -92,17 +92,22 @@ class GlitchCore(Elaboratable):
         ]
 
 
+        with m.If(self.event_polarity_in == 0):
+            m.d.comb += event_internal.eq(self.event_in)
+        with m.Else():
+            m.d.comb += event_internal.eq(~self.event_in)
+
         with m.If(self.trigger_sel_in == 0):
             m.d.comb += trigger_delay.trigger_in.eq(event_counter_async_trigger)
         with m.Else():
-            m.d.comb += trigger_delay.trigger_in.eq(self.event_in)
+            m.d.comb += trigger_delay.trigger_in.eq(event_internal)
 
         with m.If(self.delay_sel_in == 0):
             m.d.comb += trigger_pulse.trigger_in.eq(trigger_delay.trigger_delayed)
         with m.Elif(self.delay_sel_in == 1):
             m.d.comb += trigger_pulse.trigger_in.eq(event_counter_async_trigger)
         with m.Elif(self.delay_sel_in == 2):
-            m.d.comb += trigger_pulse.trigger_in.eq(self.event_in)
+            m.d.comb += trigger_pulse.trigger_in.eq(event_internal)
 
         with m.If(self.pulse_sel_in == 0):
             m.d.comb += self.glitch_out.eq(trigger_pulse.pulse)
@@ -135,7 +140,6 @@ if __name__ == "__main__":
 
             # In, from host.
             top.event_counter_arm_in,
-            top.event_counter_polarity_in,
             top.event_counter_threshold_in,
 
             # Out, to host.
@@ -159,6 +163,7 @@ if __name__ == "__main__":
             top.pulse_pulse,
 
             # In, from host.
+            top.event_polarity_in,
             top.trigger_sel_in,
             top.delay_sel_in,
             top.pulse_sel_in,

@@ -108,16 +108,16 @@ def main():
     duration_ticks = 12e6 * duration_seconds
 
     config = (
-        (0x10, (0 << 1) | 0),
+        (0x10, 0),
         (0x20, 0),
         (0x30, 0),
-        (0x00, (0 << 3) | (0 << 1) | 0),
+        (0x00, (0 << 4) | (0 << 2) | (0 << 1) | 0),
         (0x14, events),
         (0x24, delay_ticks),
         (0x34, duration_ticks),
         (0x30, 1),
         (0x20, 1),
-        (0x10, (0 << 1) | 1),
+        (0x10, 1),
     )
 
     for addr, data in config:
@@ -127,7 +127,7 @@ def main():
 
     glitcher.verbose=False
     while True:
-        event_trigger = (glitcher.readw(0x10) >> 2) & 1
+        event_trigger = (glitcher.readw(0x10) >> 1) & 1
         delay_trigger_delayed = (glitcher.readw(0x20) >> 1) & 1
         pulse = (glitcher.readw(0x30) >> 1) & 1
         print("event_trigger: {}, delay_trigger_delayed: {}, pulse: {}".format(event_trigger, delay_trigger_delayed, pulse))

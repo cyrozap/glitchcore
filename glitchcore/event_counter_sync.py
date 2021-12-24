@@ -5,7 +5,6 @@ class EventCounterSync(Elaboratable):
     def __init__(self, width=32):
         # In, from host.
         self.arm_in = Signal()
-        self.polarity_in = Signal()
         self.threshold_in = Signal(width)
 
         # Out, to host.
@@ -19,14 +18,12 @@ class EventCounterSync(Elaboratable):
         # Out, to async counter.
         self.rst_out = Signal()
         self.enable_out = Signal()
-        self.polarity_out = Signal()
         self.threshold_out = Signal(width)
 
     def elaborate(self, platform):
         m = Module()
 
         m.d.comb += [
-            self.polarity_out.eq(self.polarity_in),
             self.threshold_out.eq(self.threshold_in),
         ]
 
