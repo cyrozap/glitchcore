@@ -108,13 +108,13 @@ def main():
     duration_ticks = 12e6 * duration_seconds
 
     config = (
+        (0x10, (0 << 1) | 0),
+        (0x20, 0),
+        (0x30, 0),
         (0x00, (0 << 3) | (0 << 1) | 0),
         (0x14, events),
         (0x24, delay_ticks),
         (0x34, duration_ticks),
-        (0x10, (0 << 1) | 0),
-        (0x20, 0),
-        (0x30, 0),
         (0x30, 1),
         (0x20, 1),
         (0x10, (0 << 1) | 1),
