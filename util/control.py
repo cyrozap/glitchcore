@@ -10,9 +10,6 @@ import serial
 class GlitcherInitError(Exception):
     pass
 
-class EchoBytesMismatchException(Exception):
-    pass
-
 class NotEnoughDataException(Exception):
     pass
 
@@ -41,17 +38,11 @@ class Glitcher:
     def close(self):
         self.ser.close()
 
-    def _send_bytes(self, data, echo=False):
+    def _send_bytes(self, data):
         data = bytes(data)
         if self.debug:
             print("-> {}".format(data.hex()))
         self.ser.write(data)
-        if echo:
-            echo_data = self.ser.read(len(data))
-            if self.debug:
-                print("<- {}".format(echo_data.hex()))
-            if echo_data != data:
-                raise EchoBytesMismatchException
 
     def _recv_bytes(self, count):
         data = self.ser.read(count)
