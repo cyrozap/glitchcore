@@ -32,6 +32,11 @@ class TriggerPulse(Elaboratable):
                 with m.If(self.value >= self.threshold):
                     m.next = "STOP"
                     m.d.comb += self.pulse.eq(0)
+                with m.If(~(self.arm).bool()):
+                    m.next = "START"
+                    m.d.sync += self.value.eq(0)
+                    m.d.comb += self.pulse.eq(0)
+                    m.d.comb += self.fired.eq(0)
             with m.State("STOP"):
                 m.d.comb += self.pulse.eq(0)
                 m.d.comb += self.fired.eq(1)

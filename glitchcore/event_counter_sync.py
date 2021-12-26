@@ -46,6 +46,9 @@ class EventCounterSync(Elaboratable):
                 with m.If((self.trigger_in).bool()):
                     m.next = "DISARMED"
                     m.d.comb += self.enable_out.eq(0),
+                with m.If(~(self.arm_in).bool()):
+                    m.next = "RESET"
+                    m.d.comb += self.enable_out.eq(0),
             with m.State("DISARMED"):
                 with m.If(~(self.arm_in).bool()):
                     m.next = "RESET"
