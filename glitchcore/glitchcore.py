@@ -39,6 +39,7 @@ class GlitchCore(Elaboratable):
         # Out, to host.
         self.pulse_count = Signal(width)
         self.pulse_pulse = Signal()
+        self.pulse_fired = Signal()
 
         # In, from host.
         self.event_polarity_in = Signal()
@@ -89,6 +90,7 @@ class GlitchCore(Elaboratable):
             trigger_pulse.threshold.eq(self.pulse_threshold),
             self.pulse_count.eq(trigger_pulse.value),
             self.pulse_pulse.eq(trigger_pulse.pulse),
+            self.pulse_fired.eq(trigger_pulse.fired),
         ]
 
 
@@ -162,6 +164,7 @@ if __name__ == "__main__":
             # Out, to host.
             top.pulse_count,
             top.pulse_pulse,
+            top.pulse_fired,
 
             # In, from host.
             top.event_polarity_in,

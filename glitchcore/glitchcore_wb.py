@@ -69,7 +69,8 @@ class GlitchCoreWb(Elaboratable):
 
             reg30[0].eq(gc.pulse_arm),
             reg30[1].eq(gc.pulse_pulse),
-            reg30[2:].eq(0),
+            reg30[2].eq(gc.pulse_fired),
+            reg30[3:].eq(0),
             gc.pulse_threshold.eq(reg34),
             reg38.eq(gc.pulse_count),
         ]

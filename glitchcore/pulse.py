@@ -13,6 +13,7 @@ class TriggerPulse(Elaboratable):
         # Out, to host.
         self.value = Signal(width)
         self.pulse = Signal()
+        self.fired = Signal()
 
     def elaborate(self, platform):
         m = Module()
@@ -22,18 +23,22 @@ class TriggerPulse(Elaboratable):
                 with m.If((self.arm).bool() & (self.trigger_in).bool()):
                     m.next = "TRIGGERED"
                     m.d.comb += self.pulse.eq(1)
+                    m.d.comb += self.fired.eq(1)
                     m.d.sync += self.value.eq(self.value + 1)
             with m.State("TRIGGERED"):
                 m.d.comb += self.pulse.eq(1)
+                m.d.comb += self.fired.eq(1)
                 m.d.sync += self.value.eq(self.value + 1)
                 with m.If(self.value >= self.threshold):
                     m.next = "STOP"
                     m.d.comb += self.pulse.eq(0)
             with m.State("STOP"):
                 m.d.comb += self.pulse.eq(0)
+                m.d.comb += self.fired.eq(1)
                 with m.If(~(self.arm).bool()):
                     m.next = "START"
                     m.d.sync += self.value.eq(0)
+                    m.d.comb += self.fired.eq(0)
 
         return m
 
@@ -46,11 +51,13 @@ if __name__ == "__main__":
         for _ in range(30):
             yield
             assert not (yield dut.pulse)
+            assert not (yield dut.fired)
 
         yield dut.trigger_in.eq(1)
         for _ in range(30):
             yield
             assert not (yield dut.pulse)
+            assert not (yield dut.fired)
 
         yield dut.trigger_in.eq(0)
         yield dut.threshold.eq(0x10)
@@ -58,21 +65,25 @@ if __name__ == "__main__":
         for _ in range(30):
             yield
             assert not (yield dut.pulse)
+            assert not (yield dut.fired)
 
         yield dut.trigger_in.eq(1)
         for _ in range(0x10):
             yield
             assert (yield dut.pulse)
+            assert (yield dut.fired)
 
         for _ in range(30):
             yield
             assert not (yield dut.pulse)
+            assert (yield dut.fired)
 
         yield dut.arm.eq(0)
         yield
         yield
         assert not (yield dut.pulse)
         assert not (yield dut.value)
+        assert not (yield dut.fired)
 
     sim = Simulator(dut)
     sim.add_clock(1e-6) # 1 MHz
