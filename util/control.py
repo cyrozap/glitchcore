@@ -130,13 +130,14 @@ def main():
         event_trigger = (glitcher.readw(0x10) >> 1) & 1
         delay_trigger_delayed = (glitcher.readw(0x20) >> 1) & 1
         pulse = (glitcher.readw(0x30) >> 1) & 1
-        print("event_trigger: {}, delay_trigger_delayed: {}, pulse: {}".format(event_trigger, delay_trigger_delayed, pulse))
+        fired = (glitcher.readw(0x30) >> 2) & 1
+        print("event_trigger: {}, delay_trigger_delayed: {}, pulse: {}, fired: {}".format(event_trigger, delay_trigger_delayed, pulse, fired))
         event_count = glitcher.readw(0x18)
         delay_count = glitcher.readw(0x28)
         pulse_count = glitcher.readw(0x38)
         print("event_count: 0x{:08x}, delay_count: 0x{:08x}, pulse_count: 0x{:08x}".format(
                 event_count, delay_count, pulse_count))
-        if pulse_count >= duration_ticks:
+        if fired and not pulse:
             break
         time.sleep(1)
 
