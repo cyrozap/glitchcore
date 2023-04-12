@@ -2,8 +2,9 @@
 
 module glitchcore_wb_tb;
 
-	reg event_in, rst, clk, wb_we_i, wb_sel_i, wb_stb_i, wb_cyc_i;
+	reg event_in, rst, clk, wb_we_i, wb_stb_i, wb_cyc_i;
 	wire glitch_out, wb_ack_o;
+	reg [3:0] wb_sel_i;
 	reg [31:0] wb_adr_i;
 	reg [31:0] wb_dat_i;
 	wire [31:0] wb_dat_o;
