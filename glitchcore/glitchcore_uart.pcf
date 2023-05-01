@@ -8,9 +8,9 @@ set_io D4 96
 set_io D5 95
 
 # Pmod connector
+set_io event_in 79 # Pin 2
 set_io glitch_out 81 # Pin 4
 set_io rst 87 # Pin 7
-set_io event_in 91 # Pin 10
 
 # FTDI Port B UART
 set_io uart_tx 8
