@@ -58,39 +58,42 @@ class GlitchCoreWb(Elaboratable):
             reg10[0].eq(gc.event_counter_arm_in),
             reg10[1].eq(gc.event_trigger_out),
             reg10[2:].eq(0),
-            gc.event_counter_threshold_in.eq(reg14),
+            reg14.eq(gc.event_counter_threshold_in),
             reg18.eq(gc.event_count_out),
 
             reg20[0].eq(gc.delay_arm),
             reg20[1].eq(gc.delay_trigger_delayed),
             reg20[2:].eq(0),
-            gc.delay_threshold.eq(reg24),
+            reg24.eq(gc.delay_threshold),
             reg28.eq(gc.delay_count),
 
             reg30[0].eq(gc.pulse_arm),
             reg30[1].eq(gc.pulse_pulse),
             reg30[2].eq(gc.pulse_fired),
             reg30[3:].eq(0),
-            gc.pulse_threshold.eq(reg34),
+            reg34.eq(gc.pulse_threshold),
             reg38.eq(gc.pulse_count),
         ]
 
         with m.If(self.wb_stb_i & self.wb_we_i):
             with m.Switch(self.wb_adr_i[:8]):
                 with m.Case(0x00):
-                    m.d.sync += Cat(gc.event_polarity_in, gc.trigger_sel_in, gc.delay_sel_in, gc.pulse_sel_in).eq(self.wb_dat_i)
+                    m.d.sync += gc.event_polarity_in.eq(self.wb_dat_i[0])
+                    m.d.sync += gc.trigger_sel_in.eq(self.wb_dat_i[1])
+                    m.d.sync += gc.delay_sel_in.eq(self.wb_dat_i[2:2+2])
+                    m.d.sync += gc.pulse_sel_in.eq(self.wb_dat_i[4])
                 with m.Case(0x10):
-                    m.d.sync += gc.event_counter_arm_in.eq(self.wb_dat_i)
+                    m.d.sync += gc.event_counter_arm_in.eq(self.wb_dat_i[0])
                 with m.Case(0x14):
-                    m.d.sync += reg14.eq(self.wb_dat_i)
+                    m.d.sync += gc.event_counter_threshold_in.eq(self.wb_dat_i)
                 with m.Case(0x20):
-                    m.d.sync += gc.delay_arm.eq(self.wb_dat_i)
+                    m.d.sync += gc.delay_arm.eq(self.wb_dat_i[0])
                 with m.Case(0x24):
-                    m.d.sync += reg24.eq(self.wb_dat_i)
+                    m.d.sync += gc.delay_threshold.eq(self.wb_dat_i)
                 with m.Case(0x30):
-                    m.d.sync += gc.pulse_arm.eq(self.wb_dat_i)
+                    m.d.sync += gc.pulse_arm.eq(self.wb_dat_i[0])
                 with m.Case(0x34):
-                    m.d.sync += reg34.eq(self.wb_dat_i)
+                    m.d.sync += gc.pulse_threshold.eq(self.wb_dat_i)
 
         with m.Switch(self.wb_adr_i[:8]):
             with m.Case(0x00):
